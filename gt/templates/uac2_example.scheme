@@ -1,0 +1,51 @@
+attrs :
+{
+    bcdUSB = 0x200;
+    idVendor = 0x1D6B;
+    idProduct = 0x0104;
+};
+
+strings = (
+    {
+        lang = 0x409;
+        manufacturer = "Foo Inc.";
+        product = "Bar UAC2 Gadget";
+        serialnumber = "0123456789";
+    }
+);
+
+functions :
+{
+    uac2_usb0 :
+    {
+        instance = "usb0";
+        type = "uac2";
+        attrs:
+        {
+            p_srate = 48000;
+            p_chmask = 3;
+            p_format = "S32_LE";
+            p_ssize = 4;
+            c_srate = 48000;
+            c_chmask = 3;
+            c_format = "S32_LE";
+            c_ssize = 4;
+        };
+    };
+};
+
+configs = (
+    {
+        id = 1;
+        name = "c";
+        attrs :
+        {
+            bmAttributes = 0x80;
+            bMaxPower = 250;
+        };
+        functions = (
+            {
+                name = "uac2.usb0";
+                function = "uac2_usb0";
+            });
+    } );

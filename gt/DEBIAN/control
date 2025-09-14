@@ -1,0 +1,11 @@
+Package: gt
+Version: 0.0.1
+Section: utils
+Priority: optional
+Architecture: riscv64
+Maintainer: KaliAssistant <work.kaliassistant.github@gmail.com>
+Description: gt utility
+ Command line tool for USB gadget management.
+ gt is a command line tool for USB gadget management through
+ ConfigFS. It allows user to create, modify and remove custom
+ gadget and also load or save gadet from/to file.

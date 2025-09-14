@@ -1,0 +1,9 @@
+Package: shmled
+Version: 0.0.1-licheejack
+Section: utils
+Priority: optional
+Architecture: riscv64
+Maintainer: KaliAssistant <work.kaliassistant.github@gmail.com>
+Description: shmled writer
+ Shared memory RGB LED writer for Lichee-Jack WS2812B-GPIO Kernel space driver
+ shmled is a lightweight utility daemon that writes RGB color data into shared memory to control WS2812 RGB LEDs via the Lichee-Jack WS2812B-GPIO driver. It supports static colors, animated effects (blink, fade, rainbow), and playback of RGB frame sequences from files.

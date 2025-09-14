@@ -45,7 +45,7 @@ cmake .. \
   -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
   -DCMAKE_INSTALL_PREFIX="$ppwd/build/usr" \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_EXE_LINKER_FLAGS="-static" \
+  -DCMAKE_EXE_LINKER_FLAGS="-static -L$ppwd/lib/build/usr/lib -Wl,-rpath-link,$ppwd/lib/build/usr/lib" \
   -DGT_SETTING_PATH="/etc/gt/gt.conf"
 
 make -j`nproc`
@@ -57,6 +57,11 @@ riscv64-linux-gnu-strip ./build/usr/bin/gt
 mkdir -p ./build/etc/gt
 cp ./build/usr/etc/gt/gt.conf ./build/etc/gt
 cp -r ./templates ./build/usr/etc/gt
+mkdir -p ./build/usr/lib/systemd/system
+cp ./systemd/gt.target ./build/usr/lib/systemd/system
+cp ./systemd/gt@.service ./build/usr/lib/systemd/system
+mkdir -p ./build/usr/lib/udev/rules.d
+cp ./systemd/99-udc.rules ./build/usr/lib/udev/rules.d
 
 cp -r ./DEBIAN ./build
 mkdir -p ./pkg

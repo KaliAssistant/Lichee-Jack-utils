@@ -1,0 +1,10 @@
+[Unit]
+Description=Lichee-Jack coreutils daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/jackstart
+
+[Install]
+WantedBy=multi-user.target
+

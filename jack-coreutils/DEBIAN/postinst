@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    configure)
+        # Reload systemd units
+        systemctl daemon-reload || true
+
+        # Enable service(s)
+        systemctl enable jack-coreutils.service || true
+        ;;
+esac
+
+exit 0
+

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+usage() {
+    echo -e "Usage: $0 [DHCP_CLIENT|DHCP_SERVER|STATIC|AUTO]\n"
+}
+
+all_down() {
+    pkill -9 dnsmasq
+    nmcli con down static dhcp-server dhcp-client || true
+}
+
+configure_client() {
+    all_down
+    nmcli con up dhcp-client &
+}
+
+configure_server() {
+    all_down
+    nmcli con up dhcp-server
+    dnsmasq --conf-file /root/config/dnsmasq.conf
+}
+
+configure_static() {
+    all_down
+    nmcli con up static
+}
+
+
+case $1 in
+    "DHCP_CLIENT")
+        configure_client
+        ;;
+    "DHCP_SERVER")
+        configure_server
+        ;;
+    "STATIC")
+        configure_static
+        ;;
+    "AUTO")
+        all_down
+        sniffed="$(timeout 15 tcpdump -Z nobody -i end0 -c 3 udp src port 68 and udp dst port 67 -v 2>&1)"
+        if echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Discover' && \
+          ! echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Request'; then
+            configure_server
+            count 3
+            while [ "${count}" -gt 0 ]; do
+                LED -c FF00FF
+                sleep 0.25
+                LED -c FFFF00
+                sleep 0.25
+                count=$((count-1))
+            done
+        else
+            configure_client
+            count 3
+            while [ "${count}" -gt 0 ]; do
+                LED -c FF00FF
+                sleep 0.25
+                LED -c FFFFFF
+                sleep 0.25
+                count=$((count-1))
+            done
+        fi
+        ;;
+    *)
+        usage
+        exit 0
+        ;;
+esac

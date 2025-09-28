@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    remove|purge)
+        systemctl stop jack-coreutils.service || true
+        systemctl disable jack-coreutils.service || true
+        ;;
+esac
+
+exit 0
+

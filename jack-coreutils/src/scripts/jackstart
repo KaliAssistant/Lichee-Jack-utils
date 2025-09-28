@@ -1,0 +1,176 @@
+#!/bin/bash
+
+export LOG="logger -t LicheeJack [*]"
+export LOG_ERR="logger -t LicheeJack -p 3 [!]"
+
+
+MODE"DEBUG"
+MODSWITCH_POS=$(/usr/bin/SWITCH)
+
+prepare_usb_gadgat() {
+    echo "device" > /proc/cviusb/otg_role
+}
+
+umount_udisk() {
+    sync
+    LOOPDEV=$(losetup -j "/root/udisk.img" | cut -d: -f1)
+    if [ -n "$LOOPDEV" ]; then
+        $LOG "Udisk is attached at $LOOPDEV"
+        MNTPOINT=$(mount | grep "^$LOOPDEV" | awk '{print $3}')
+        if [ -n "$MNTPOINT" ]; then
+            $LOG "Unmounting $MNTPOINT ..."
+            umount -lf "$MNTPOINT"
+        fi
+        $LOG "Deaching $LOOPDEV ..."
+        losetup -d "$LOOPDEV"
+    fi
+}
+
+mount_udisk() {
+    $LOG "Mounting udisk to /root/udisk.d ..."
+    mkdir -p /root/udisk.d
+    mount -o loop /root/udisk.img /root/udisk.d
+}
+
+
+enter_payload1_mode() {
+    $LOG "Entering PAYLOAD1 mode"
+    MODE="PAYLOAD1"
+    /usr/bin/LED -c 00FFFF -lds 100000
+
+    ip link set end0 down
+    macchanger -r end0
+    ip link set end0 up
+
+    umount_udisk
+    sleep 0.5
+    mount_udisk
+
+    systemctl stop usb-gadget-rndis-usb0.service
+    systemctl stop gt@*.service
+    systemctl stop ssh.service
+
+    /usr/bin/RUN MOD1
+
+    enter_idle_mode
+
+}
+
+
+enter_payload2_mode() {
+    $LOG "Entering PAYLOAD2 mode"
+    MODE="PAYLOAD2"
+    /usr/bin/LED -c FF00FF -lds 100000
+
+    ip link set end0 down
+    macchanger -r end0
+    ip link set end0 up
+
+    umount_udisk
+    sleep 0.5
+    mount_udisk
+
+    systemctl stop usb-gadget-rndis-usb0.service
+    systemctl stop gt@*.service
+    systemctl stop ssh.service
+
+    /usr/bin/RUN MOD2
+
+    enter_idle_mode
+
+}
+
+
+enter_debug_mode() {
+    $LOG "Entering DEBUG mode"
+    MODE="DEBUG"
+    /usr/bin/LED -c 0000FF -lds 1000000
+
+    umount_udisk
+    prepare_usb_gadgat
+
+    systemctl stop gt@*.service
+    sleep 0.5
+    systemctl start gt@debug.service
+    sleep 0.5
+    systemctl start usb-gadget-rndis-usb0.service
+    systemctl start ssh.service
+
+    sleep 1
+    enter_idle_mode
+}
+
+
+enter_idle_mode() {
+    $LOG "Entering IDLE mode"
+    while true
+    do
+        MODSWITCH_POS=$(/usr/bin/SWITCH)
+        case $MODSWITCH_POS in
+            "switch2")
+                if [ "$MODE" != "PAYLOAD2" ]; then
+                    enter_payload2_mode
+                fi
+                ;;
+            "switch1")
+                if [ "$MODE" != "PAYLOAD1" ]; then
+                    enter_payload1_mode
+                fi
+                ;;
+            *)
+                if [ "$MODE" != "DEBUG" ]; then
+                    enter_debug_mode
+                fi
+                ;;
+        esac
+        sleep 2
+    done
+}
+
+
+enter_factory_mode() {
+    $LOG "Entering FACTORY mode"
+    /usr/bin/LED -c FFFF00 -lbs 1000000
+
+    prepare_usb_gadgat
+    
+    systemctl stop gt@*.service
+    sleep 0.5
+    systemctl start gt@factory.service
+    sleep 0.5
+    systemctl start usb-gadget-rndis-usb0.service
+    systemctl start ssh.service
+
+    while true
+    do
+        sleep 1 # loop until reboot
+    done
+}
+
+check_config_all() {
+    if [ ! -e /root/licheejack.toml ] || [ ! -e /root/udisk.img ]; then
+        $LOG_ERR "/root/licheejack.toml or /root/udisk.img not found !"
+        $LOG_ERR "Please copy your licheejack config and udisk file to /root."
+        enter_factory_mode
+    fi
+}
+
+
+run() {
+    case $MODSWITCH_POS in
+        "switch2")
+            enter_payload2_mode 
+            ;;
+        "switch1")
+            enter_payload1_mode
+            ;;
+        *)
+            enter_debug_mode
+            ;;
+    esac
+}
+
+
+check_config_all
+
+run > /dev/null 2>&1

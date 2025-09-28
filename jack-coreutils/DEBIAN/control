@@ -1,0 +1,10 @@
+Package: jack-coreutils
+Version: 0.0.1
+Section: utils
+Priority: optional
+Architecture: riscv64
+Maintainer: KaliAssistant <work.kaliassistant.github@gmail.com>
+Description: Lichee-jack core utility
+ This package provides the essential core utility scripts for the Lichee-Jack
+ platforms. It includes startup and mode switch management, payload execution, 
+ LED control, network mode configuration, and storage mounting helpers.

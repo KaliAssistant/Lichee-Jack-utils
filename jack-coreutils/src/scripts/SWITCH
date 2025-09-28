@@ -1,0 +1,5 @@
+#!/bin/bash
+
+code=$(cat /dev/modsw)
+
+printf "switch%s\n" "$code"

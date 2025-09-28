@@ -148,8 +148,8 @@ enter_factory_mode() {
 }
 
 check_config_all() {
-    if [ ! -e /root/licheejack.toml ] || [ ! -e /root/udisk.img ]; then
-        $LOG_ERR "/root/licheejack.toml or /root/udisk.img not found !"
+    if [ ! -e /root/config/licheejack.toml ] || [ ! -e /root/udisk.img ]; then
+        $LOG_ERR "/root/config/licheejack.toml or /root/udisk.img not found !"
         $LOG_ERR "Please copy your licheejack config and udisk file to /root."
         enter_factory_mode
     fi

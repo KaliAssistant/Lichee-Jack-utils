@@ -8,6 +8,7 @@ ppwd=$(pwd)
 echo "Build jack-coreutils..."
 mkdir -p ./build/usr/bin
 mkdir -p ./build/usr/lib/systemd/system
+mkdir -p ./build/root/config
 cp -r ./DEBIAN ./build
 cp src/scripts/* ./build/usr/bin
 cp src/systemd/jack-coreutils.service ./build/usr/lib/systemd/system

@@ -79,6 +79,7 @@ class JackConf:
             backup_file(path)
             with open(path, "w") as f:
                 f.write(content)
+            os.chmod(path, 0o600) # <-- set mod 600, or NetworkManager can't read it
             print(f"Applied {path}")
         else:
             print(f"--- {name}.nmconnection ---\n{content}\n")

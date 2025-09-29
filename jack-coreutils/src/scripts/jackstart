@@ -4,7 +4,7 @@ export LOG="logger -t LicheeJack [*]"
 export LOG_ERR="logger -t LicheeJack -p 3 [!]"
 
 
-MODE"DEBUG"
+MODE="DEBUG"
 MODSWITCH_POS=$(/usr/bin/SWITCH)
 
 prepare_usb_gadgat() {

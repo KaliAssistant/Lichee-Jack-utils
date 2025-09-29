@@ -16,7 +16,7 @@ umount_udisk() {
     LOOPDEV=$(losetup -j "/root/udisk.img" | cut -d: -f1)
     if [ -n "$LOOPDEV" ]; then
         $LOG "Udisk is attached at $LOOPDEV"
-        MNTPOINT=$(mount | grep "^$LOOPDEV" | awk '{print $3}')
+        MNTPOINT=$(mount | grep "^/root/udisk.img" | awk '{print $3}')
         if [ -n "$MNTPOINT" ]; then
             $LOG "Unmounting $MNTPOINT ..."
             umount -lf "$MNTPOINT"
@@ -88,6 +88,8 @@ enter_debug_mode() {
 
     umount_udisk
     prepare_usb_gadgat
+
+    pkill -9 dnsmasq
 
     systemctl stop gt@*.service
     sleep 0.5

@@ -17,7 +17,7 @@ configure_client() {
 configure_server() {
     all_down
     nmcli con up dhcp-server
-    dnsmasq --conf-file /root/config/dnsmasq.conf
+    dnsmasq --conf-file=/root/config/dnsmasq.conf
 }
 
 configure_static() {
@@ -42,7 +42,7 @@ case $1 in
         if echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Discover' && \
           ! echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Request'; then
             configure_server
-            count 3
+            count=3
             while [ "${count}" -gt 0 ]; do
                 LED -c FF00FF
                 sleep 0.25
@@ -52,7 +52,7 @@ case $1 in
             done
         else
             configure_client
-            count 3
+            count=3
             while [ "${count}" -gt 0 ]; do
                 LED -c FF00FF
                 sleep 0.25

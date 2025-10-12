@@ -10,5 +10,5 @@ Description: AIC8800 SDIO Wi-Fi firmware and modprobe configuration
  SDIO-based variants (AIC8800DC, DW, D80, etc.) and sets the kernel
  module parameter aicwf_dbg_level=1 by default to limit driver logs
  to errors only.
-Depends: modprobe, kmod
+Depends: kmod
 License: Proprietary

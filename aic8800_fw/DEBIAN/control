@@ -1,0 +1,14 @@
+Package: aic8800-firmware
+Version: 1.0-1
+Section: kernel
+Priority: optional
+Architecture: riscv64
+Maintainer: KaliAssistant <work.kaliassistant.github@gmail.com>
+Description: AIC8800 SDIO Wi-Fi firmware and modprobe configuration
+ This package provides the firmware binaries and configuration files
+ for the AIC8800 series wireless chipset. It includes firmware for
+ SDIO-based variants (AIC8800DC, DW, D80, etc.) and sets the kernel
+ module parameter aicwf_dbg_level=1 by default to limit driver logs
+ to errors only.
+Depends: modprobe, kmod
+License: Proprietary

@@ -1,0 +1,49 @@
+#!/bin/sh
+# /usr/bin/BATTERY
+# Reads Li-ion battery voltage from /dev/cvi-saradc0 and prints percentage@voltage
+# ADC: 0–4095  →  0–4.8 V
+
+ADC_DEV="/dev/cvi-saradc0"
+MAX_ADC=4095
+MAX_VOLT=4.8
+
+# Optional: select ADC channel
+echo 1 > "$ADC_DEV" 2>/dev/null
+
+RAW=$(cat "$ADC_DEV" 2>/dev/null)
+[ -z "$RAW" ] && { echo "0%@0.0000v"; exit 1; }
+
+# Convert raw ADC to voltage
+VOLT=$(awk -v raw="$RAW" -v max_adc="$MAX_ADC" -v max_v="$MAX_VOLT" 'BEGIN { printf "%.4f", raw * max_v / max_adc }')
+
+# Realistic Li-ion voltage-to-percentage curve (approximation)
+awk -v v="$VOLT" '
+function pct(v) {
+    if (v >= 4.200) return 100;
+    else if (v >= 4.150) return 95;
+    else if (v >= 4.100) return 90;
+    else if (v >= 4.050) return 85;
+    else if (v >= 4.000) return 80;
+    else if (v >= 3.950) return 75;
+    else if (v >= 3.900) return 70;
+    else if (v >= 3.850) return 65;
+    else if (v >= 3.800) return 60;
+    else if (v >= 3.750) return 55;
+    else if (v >= 3.700) return 50;
+    else if (v >= 3.650) return 45;
+    else if (v >= 3.600) return 40;
+    else if (v >= 3.550) return 35;
+    else if (v >= 3.500) return 30;
+    else if (v >= 3.450) return 25;
+    else if (v >= 3.400) return 20;
+    else if (v >= 3.350) return 15;
+    else if (v >= 3.300) return 10;
+    else if (v >= 3.250) return 5;
+    else if (v >= 3.000) return 1;
+    else return 0;
+}
+BEGIN {
+    p = pct(v);
+    printf "%d%%@%.4fv\n", p, v;
+}'
+

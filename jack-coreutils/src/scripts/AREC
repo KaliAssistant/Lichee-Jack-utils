@@ -1,0 +1,47 @@
+#!/usr/bin/bash
+# AREC - simple audio control and recording helper
+
+# Usage:
+#   AREC SETVOL <0-100>
+#   AREC RECORD <output.wav | ->
+
+case "$1" in
+  SETVOL)
+    if [ -z "$2" ]; then
+      echo "Usage: $0 SETVOL <0-100>" >&2
+      exit 1
+    fi
+    VOL="$2"
+    if [ "$VOL" -lt 0 ] || [ "$VOL" -gt 100 ]; then
+      echo "Volume must be between 0 and 100" >&2
+      exit 1
+    fi
+    # Map 0–100 → 0–24 (integer)
+    AMIX_VOL=$(( VOL * 24 / 100 ))
+    echo "Setting ADC Capture Volume to $AMIX_VOL (mapped from $VOL%)" >&2
+    amixer -D hw:0 cset name='ADC Capture Volume' "$AMIX_VOL" >&2
+    ;;
+
+  RECORD)
+    if [ -z "$2" ]; then
+      echo "Usage: $0 RECORD <output.wav | ->" >&2
+      exit 1
+    fi
+    echo "Recording from hw:0,0 at 48kHz 16-bit..." >&2
+    if [ "$2" = "-" ]; then
+      # Output to stdout for piping
+      arecord -D hw:0,0 -r 48000 -f S16_LE -t wav
+    else
+      # Save to file
+      arecord -D hw:0,0 -r 48000 -f S16_LE -t wav "$2"
+    fi
+    ;;
+
+  *)
+    echo "Usage:" >&2
+    echo "  $0 SETVOL <0-100>" >&2
+    echo "  $0 RECORD <output.wav | ->" >&2
+    exit 1
+    ;;
+esac
+

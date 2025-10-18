@@ -1,69 +1,138 @@
 #!/bin/bash
+set -o pipefail
+
+LOG()     { logger -t LicheeJack "[*] $*"; }
+LOG_ERR() { logger -t LicheeJack -p err "[!] $*"; }
 
 usage() {
-    echo -e "Usage: $0 [DHCP_CLIENT|DHCP_SERVER|STATIC|AUTO]\n"
+    echo "Usage: $0 <MODE>"
+    echo "  MODE:"
+    echo "      DHCP_CLIENT     active dhcp-client connection for interface end0"
+    echo "      DHCP_SERVER     active dhcp-server connection for interface end0, and also start udhcpd \`netmode-end0\`"
+    echo "      STATIC          active static connection for interface end0"
+    echo "      AUTO            sniff the network, then active dhcp-client or dhcp-server in auto mode"
+    echo "      *               active custom connection for interface end0"
+    echo "      STOP_ALL        deactive all connection"
+    exit 1
 }
 
 all_down() {
-    pkill -9 dnsmasq
-    nmcli con down static dhcp-server dhcp-client || true
+    UDHCPCTL STOP netmode-end0
+    nmcli -t -f NAME,DEVICE c show --active | awk -F: '$2=="end0"{print $1}' | while read -r active_conn; do
+      LOG "NETMODE: Found active connection: $active_conn"
+      LOG "NETMODE: Deactiving connection $active_conn ..."
+      if ! nmcli con down "$active_conn" 2>&1 | logger -t LicheeJack; then
+        LOG_ERR "NETMODE: Failed to deactive connection $active_conn !"
+        exit 1
+      fi
+    done
 }
 
 configure_client() {
     all_down
-    nmcli con up dhcp-client &
+    LOG "NETMODE: Activing connection dhcp-client ..."
+    if ! nmcli con up dhcp-client 2>&1 | logger -t LicheeJack; then
+      LOG_ERR "NETMODE: Failed to active connection dhcp-client !"
+      exit 1
+    fi
 }
 
 configure_server() {
     all_down
-    nmcli con up dhcp-server
-    dnsmasq --conf-file=/root/config/dnsmasq.conf
+    LOG "NETMODE: Activing connection dhcp-server ..."
+    if ! nmcli con up dhcp-server 2>&1 | logger -t LicheeJack; then
+      LOG_ERR "NETMODE: Failed to active connection dhcp-server !"
+      exit 1
+    fi
+    LOG "NETMODE: Starting udhcpd for connection dhcp-server ..."
+    if ! UDHCPCTL START netmode-end0; then
+      LOG_ERR "NETMODE: Failed to start udhcpd for connection dhcp-server ! stop."
+      all_down
+      exit 1
+    fi
 }
 
 configure_static() {
     all_down
-    nmcli con up static
+    LOG "NETMODE: Activing connection static ..."
+    if ! nmcli con up static 2>&1 | logger -t LicheeJack; then
+      LOG_ERR "NETMODE: Failed to active connection static !"
+      exit 1
+    fi
 }
 
 
-case $1 in
-    "DHCP_CLIENT")
+configure_auto() {
+    all_down
+    LOG "NETMODE: Activing connection in AUTO mode ..."
+    LOG "NETMODE: Sniffing network end0 ... (15 sec)"
+    sniffed="$(timeout 15 tcpdump -Z nobody -i end0 -c 3 udp src port 68 and udp dst port 67 -v 2>/dev/null)"
+    if [ -z "$sniffed" ]; then
+      LOG "NETMODE: Sniffer: No DHCP traffic detected, defaulting to DHCP client..."
+      configure_client
+      return
+    fi
+
+    if echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Discover' && \
+          ! echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Request'; then
+
+      LOG "NETMODE: Sniffer: DHCP Discover message found and no Request message found! This network may have no dhcp-server, activing connection dhcp-server in AUTO mode ..."
+      configure_server
+      count=3
+      while [ "${count}" -gt 0 ]; do
+        LED -c FF00FF
+        sleep 0.25
+        LED -c FFFF00
+        sleep 0.25
+        count=$((count-1))
+      done
+    else
+      LOG "NETMODE: Sniffer: DHCP Request message found! This network have dhcp-server, activing connection dhcp-client in AUTO mode ..."
+      configure_client
+      count=3
+      while [ "${count}" -gt 0 ]; do
+        LED -c FF00FF
+        sleep 0.25
+        LED -c FFFFFF
+        sleep 0.25
+        count=$((count-1))
+      done
+    fi
+}
+
+
+configure_custom() {
+    local custom="$1"
+    all_down
+    LOG "NETMODE: Activing custom connection $custom ..."
+    if ! nmcli con up "$custom" 2>&1 | logger -t LicheeJack; then
+      LOG_ERR "NETMODE: Failed to active custom connection $custom !"
+      exit 1
+    fi
+}
+
+if [ -z "$1" ]; then
+  usage
+fi
+
+
+case "$1" in
+    DHCP_CLIENT)
         configure_client
         ;;
-    "DHCP_SERVER")
+    DHCP_SERVER)
         configure_server
         ;;
-    "STATIC")
+    STATIC)
         configure_static
         ;;
-    "AUTO")
+    AUTO)
+        configure_auto
+        ;;
+    STOP_ALL)
         all_down
-        sniffed="$(timeout 15 tcpdump -Z nobody -i end0 -c 3 udp src port 68 and udp dst port 67 -v 2>&1)"
-        if echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Discover' && \
-          ! echo "${sniffed}" | grep -q 'DHCP-Message (53), length 1: Request'; then
-            configure_server
-            count=3
-            while [ "${count}" -gt 0 ]; do
-                LED -c FF00FF
-                sleep 0.25
-                LED -c FFFF00
-                sleep 0.25
-                count=$((count-1))
-            done
-        else
-            configure_client
-            count=3
-            while [ "${count}" -gt 0 ]; do
-                LED -c FF00FF
-                sleep 0.25
-                LED -c FFFFFF
-                sleep 0.25
-                count=$((count-1))
-            done
-        fi
         ;;
     *)
-        usage
-        exit 0
+        configure_custom "$1"
         ;;
 esac

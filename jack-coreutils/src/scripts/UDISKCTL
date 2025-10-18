@@ -1,0 +1,55 @@
+#!/usr/bin/bash
+set -o pipefail
+
+LOG()     { logger -t LicheeJack "[*] $*"; }
+LOG_ERR() { logger -t LicheeJack -p err "[!] $*"; }
+
+case "$1" in
+  MOUNT)
+    if [ -z "$2" ] || [ -z "$3" ]; then
+      echo "Usage: $0 MOUNT <udisk img path> <mount point>"
+      exit 1
+    fi
+    LOG "UDISKCTL: Mounting udisk $2 to $3 ..."
+    if ! mount -o loop,rw,exec "$2" "$3" 2>&1 | logger -t LicheeJack; then
+      LOG_ERR "UDISKCTL: Mount udisk failed!"
+      exit 1
+    fi
+    ;;
+
+  UMOUNT)
+    if [ -z "$2" ]; then
+      echo "Usage: $0 UMOUNT <udisk img path>"
+      exit 1
+    fi
+    LOG "UDISKCTL: Unmounting $2 ..."
+    sync
+    LOOPDEV=$(losetup -j "$2" | cut -d: -f1)
+    if [ -n "$LOOPDEV" ]; then
+      LOG "UDISKCTL: Udisk is attached at $LOOPDEV"
+      MNTPOINT=$(mount | grep -E "^($2|$LOOPDEV)" | awk '{print $3}')
+      if [ -n "$MNTPOINT" ]; then
+        LOG "UDISKCTL: Unmounting $MNTPOINT ..."
+        if ! umount -lf "$MNTPOINT" 2>&1 | logger -t LicheeJack; then
+          LOG_ERR "UDISKCTL: Unmount udisk failed!"
+          exit 1
+        fi
+      else
+        LOG "UDISKCTL: Loop device $LOOPDEV not mounted. Detaching..."
+        if ! losetup -d "$LOOPDEV" 2>&1 | logger -t LicheeJack; then
+          LOG_ERR "UDISKCTL: Failed to detach loop device $LOOPDEV"
+        fi
+      fi
+    else
+      LOG_ERR "UDISKCTL: Udisk $2 not attached to any loop device!"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Usage: $0 [ACTION] <path>"
+    echo "       $0 MOUNT  <udisk img path> <mount point>"
+    echo "       $0 UMOUNT <udisk img path>"
+    exit 1
+    ;;
+esac
+

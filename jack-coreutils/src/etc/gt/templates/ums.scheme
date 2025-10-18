@@ -1,0 +1,52 @@
+attrs :
+{
+    bcdUSB = 0x200;
+    idVendor = 0x1D6B;
+    idProduct = 0x6d99;
+};
+
+strings = (
+    {
+        lang = 0x409;
+        manufacturer = "KALIASSISTANT";
+        product = "LICHEE-JACK V1.0 SharkJack/LANTap (UMS MODE)";
+        serialnumber = "00000000000000000000000000000000";
+    }
+);
+functions :
+{
+    mass_storage : 
+    {
+        instance = "ums0";
+        type = "mass_storage";
+        attrs :
+        {
+            stall = 1;
+            luns = (
+                {
+                    cdrom = 0;
+                    ro = 0;
+                    removable = 1;
+                    nofua = 0;
+                    file = "/root/udisk.d/udisk.img";  # your .img file
+                }
+	              );
+        };
+    };
+};
+
+configs = (
+    {
+        id = 1;
+        name = "c";
+        attrs :
+        {
+            bmAttributes = 0x80;
+            bMaxPower = 250;
+        };
+        functions = (
+            {
+                name = "mass_storage.ums0";
+                function = "mass_storage";
+            });
+    } );

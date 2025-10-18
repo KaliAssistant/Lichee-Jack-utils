@@ -1,0 +1,95 @@
+#!/usr/bin/bash
+set -o pipefail
+
+LOG()     { logger -t LicheeJack "[*] $*"; }
+LOG_ERR() { logger -t LicheeJack -p err "[!] $*"; }
+
+usage() {
+  echo "Usage: $0 <MODE>"
+  echo "  MODE:"
+  echo "      MANAGED     managed mode, managed by NetworkManager"
+  echo "      UNMANAGED   unmanaged mode, if you want run hostapd, use this mode"
+  echo "      MONITOR     active-monitor mode, support frame-injection"
+  exit 1
+}
+
+del_iface() {
+  devinfo="$(ip -j link show | jq '.[] | select(.ifname=="wlan0")')"
+  if [ -n "$devinfo" ]; then
+    LOG "WIFIMODE: Found interface wlan0. Deleting..."
+    if ! iw dev wlan0 del | logger -t LicheeJack; then
+      LOG_ERR "WIFIMODE: Couldn't delete interface wlan0 !"
+      exit 1
+    fi
+    LOG "WIFIMODE: Interface wlan0 deleted."
+  fi
+  LOG "WIFIMODE: Interface wlan0 does not exist. Ignore."
+}
+
+set_iface_managed() {
+  del_iface
+  phyname="$(iw phy | head -n1 | awk -F' ' '{print $2}')"
+  LOG "WIFIMODE: Creating managed interface wlan0 ..."
+  if ! iw phy "$phyname" interface add wlan0 type managed | logger -t LicheeJack; then
+    LOG_ERR "WIFIMODE: Couldn't create managed interface wlan0 !"
+    exit 1
+  fi
+  LOG "WIFIMODE: Managed interface wlan0 created."
+}
+
+set_iface_active_monitor() {
+  del_iface
+  phyname="$(iw phy | head -n1 | awk -F' ' '{print $2}')"
+  LOG "WIFIMODE: Creating active-monitor interface wlan0 ..."
+  if ! iw phy "$phyname" interface add wlan0 type monitor flags active | logger -t LicheeJack; then
+    LOG_ERR "WIFIMODE: Couldn't create active-monitor interface wlan0 !"
+    exit 1
+  fi
+  LOG "WIFIMODE: Active-monitor interface wlan0 created."
+}
+
+set_mode_managed() {
+  set_iface_managed
+  LOG "WIFIMODE: Set interface wlan0 to managed mode ..."
+  if ! nmcli dev set wlan0 managed yes | logger -t LicheeJack; then
+    LOG_ERR "WIFIMODE: Couldn't set interface wlan0 to managed mode !"
+    exit 1
+  fi
+  LOG "WIFIMODE: Interface wlan0 now is in managed mode."
+}
+
+set_mode_unmanaged() {
+  set_iface_managed
+  LOG "WIFIMODE: Set interface wlan0 to unmanaged mode ..."
+  if ! nmcli dev set wlan0 managed no | logger -t LicheeJack; then
+    LOG_ERR "WIFIMODE: Couldn't set interface wlan0 to unmanaged mode !"
+    exit 1
+  fi
+  LOG "WIFIMODE: Interface wlan0 now is in unmanaged mode."
+}
+
+set_mode_monitor() {
+  set_mode_unmanaged
+  LOG "WIFIMODE: Set interface wlan0 to active-monitor mode ..."
+  set_iface_active_monitor
+  LOG "WIFIMODE: Interface wlan0 now is in active-monitor mode."
+}
+
+if [ -z "$1" ]; then
+  usage
+fi
+
+case "$1" in
+  MANAGED)
+    set_mode_managed
+    ;;
+  UNMANAGED)
+    set_mode_unmanaged
+    ;;
+  MONITOR)
+    set_mode_monitor
+    ;;
+  *)
+    usage
+    ;;
+esac

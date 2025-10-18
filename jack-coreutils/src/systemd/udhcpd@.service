@@ -1,0 +1,10 @@
+[Unit]
+Description=Start udhcpd daemon use conf file
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/udhcpd -f /root/config/udhcpd/%i.conf
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

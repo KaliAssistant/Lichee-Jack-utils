@@ -1,0 +1,97 @@
+#!/usr/bin/bash
+set -o pipefail
+
+LOG()     { logger -t LicheeJack "[*] $*"; }
+LOG_ERR() { logger -t LicheeJack -p err "[!] $*"; }
+
+usage () {
+  echo "Usage: $0 <ACTION> <UNIT (/root/config/udhcpd/<unit>.conf)>"
+  echo "  ACTION:"
+  echo "      START     <UNIT>    start udhcpd@<unit>.service"
+  echo "      RESTART   <UNIT>    restart udhcpd@<unit>.service"
+  echo "      STOP      <UNIT>    stop udhcpd@<unit>.service"
+  echo "      STOP_ALL            stop udhcpd@*.service"
+  exit 1
+}
+
+
+stop_all() {
+  LOG "UDHCPCTL: Stoping all ..."
+  if ! systemctl stop 'udhcpd@*' 2>&1 | logger -t LicheeJack; then
+    LOG_ERR "UDHCPCTL: Failed to stop udhcpd@* units!"
+    exit 1
+  fi
+}
+
+stop_unit() {
+  local unit="$1"
+  LOG "UDHCPCTL: Stoping $unit ..."
+  if ! systemctl -q is-active "udhcpd@${unit}"; then
+    LOG_ERR "UDHCPCTL: udhcpd@${unit} is not an active unit. Ignore..."
+    return 0
+  else
+    if ! systemctl stop "udhcpd@${unit}"; then
+      LOG_ERR "UDHCPCTL: Failed to stop udhcpd@${unit} !"
+      exit 1
+    fi
+  fi
+}
+
+start_unit() {
+  local unit="$1"
+  LOG "UDHCPCTL: Starting $unit ..."
+  if systemctl -q is-active "udhcpd@${unit}"; then
+    LOG "UDHCPCTL: udhcpd@${unit} already exists. Restart..."
+    stop_unit "$unit"
+  fi
+
+  if ! systemctl start "udhcpd@${unit}"; then
+    LOG_ERR "UDHCPCTL: Failed to start udhcpd@${unit} !"
+    exit 1
+  fi
+    
+  if ! systemctl -q is-active "udhcpd@${unit}"; then
+    LOG_ERR "UDHCPCTL: udhcpd@${unit} failed to stay active!"
+    exit 1
+  fi
+  LOG "UDHCPCTL: udhcpd@${unit} started successfuly."
+}
+
+restart_unit() {
+  local unit="$1"
+  LOG "UDHCPCTL: Restarting $unit ..."
+  stop_unit "$unit"
+  start_unit "$unit"
+}
+
+if [ -z "$1" ]; then
+  usage
+fi
+
+case "$1" in
+  START)
+    if [ -z "$2" ]; then
+      usage
+    fi
+    start_unit "$2"
+    ;;
+  RESTART)
+    if [ -z "$2" ]; then
+      usage
+    fi
+    restart_unit "$2"
+    ;;
+  STOP)
+    if [ -z "$2" ]; then
+      usage
+    fi
+    stop_unit "$2"
+    ;;
+  STOP_ALL)
+    stop_all
+    ;;
+  *)
+    usage
+    ;;
+esac
+

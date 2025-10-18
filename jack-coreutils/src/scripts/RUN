@@ -7,22 +7,22 @@ LOG_ERR="logger -t LicheeJack -p 3 [!]"
 $LOG "Prepping PAYLOAD environment..."
 
 pre_check() {
-    if [ ! -d /root/udisk.d/payloads/mod1.d ] || [ ! -d /root/udisk.d/payloads/mod2.d ]; then
+    if [ ! -d /root/payloads.d/mod1.d ] || [ ! -d /root/payloads.d/mod2.d ]; then
         $LOG_ERR "Cannot find payloads directory! stop."
         /usr/bin/LED -c FF0000 -lbs 500000
         exit 1
     fi
 
-    if [ ! -d /root/udisk.d/loot ]; then
-        $LOG "LOOT directory not found. creating /root/udisk.d/loot ... "
-        mkdir -p /root/udisk.d/loot
+    if [ ! -d /root/loot.d ]; then
+        $LOG "LOOT directory not found. creating /root/loot.d ... "
+        mkdir -p /root/loot.d
     fi
 }
 
 case $ARG in
     "MOD1")
           pre_check
-          payload=$(find "/root/udisk.d/payloads/mod1.d"/payload* 2>/dev/null | tail -n1)
+          payload=$(find "/root/payloads.d/mod1.d"/payload* 2>/dev/null | tail -n1)
           case $(basename "${payload}") in
               "payload.py")
                   $LOG "Running payload \`${payload}\` (python3)"
@@ -34,7 +34,7 @@ case $ARG in
                   bash -C "${payload}" > /dev/null 2>&1
                   ;;
               *)
-                  $LOG_ERR "Cannot find any executable payloads in /root/udisk.d/payloads/mod1.d !"
+                  $LOG_ERR "Cannot find any executable payloads in /root/payloads.d/mod1.d !"
                   /usr/bin/LED -c FF0000 -lbs 500000
                   exit 1
                   ;;
@@ -42,7 +42,7 @@ case $ARG in
           ;;
     "MOD2")
           pre_check
-          payload=$(find "/root/udisk.d/payloads/mod2.d"/payload* 2>/dev/null | tail -n1)
+          payload=$(find "/root/payloads.d/mod2.d"/payload* 2>/dev/null | tail -n1)
           case $(basename "${payload}") in
               "payload.py")
                   $LOG "Running payload \`${payload}\` (python3)"
@@ -54,7 +54,7 @@ case $ARG in
                   bash -C "${payload}" > /dev/null 2>&1
                   ;;
               *)
-                  $LOG_ERR "Cannot find any executable payloads in /root/udisk.d/payloads/mod2.d !"
+                  $LOG_ERR "Cannot find any executable payloads in /root/payloads.d/mod2.d !"
                   /usr/bin/LED -c FF0000 -lbs 500000
                   exit 1
                   ;;

@@ -1,0 +1,70 @@
+#!/usr/bin/bash
+set -o pipefail
+
+LOG()     { logger -t LicheeJack "[*] $*"; }
+LOG_ERR() { logger -t LicheeJack -p err "[!] $*"; }
+
+stop_all() {
+  LOG "USBMODE: Stopping all ..."
+  if ! systemctl stop 'gt@*' 2>&1 | logger -t LicheeJack; then
+    LOG_ERR "USBMODE: Failed to stop gt@* units!"
+    exit 1
+  fi
+}
+
+start_mode() {
+  local mode="$1"
+  local unit="gt@${mode}"
+
+  LOG "USBMODE: Starting ${mode} ($unit) ..."
+  systemctl start "$unit" 2>&1 | logger -t LicheeJack
+
+  # --- status check: make sure unit actually exists and is running ---
+  if ! systemctl status "$unit" >/dev/null 2>&1; then
+    LOG_ERR "USBMODE: $unit does not exist or failed to load!"
+    exit 1
+  fi
+
+  # check if service active (running)
+  if ! systemctl -q is-active "$unit"; then
+    LOG_ERR "USBMODE: $unit failed to start (inactive or failed)!"
+    systemctl status "$unit" -n 3 | logger -t LicheeJack
+    exit 1
+  fi
+
+  LOG "USBMODE: $unit is active."
+  return 0
+}
+
+usage() {
+  echo "Usage: $0 <MODE>"
+  echo "  MODE:"
+  echo "      DEBUG    usb-cdc-ncm for debug mode"
+  echo "      NCM      usb-cdc-ncm for custom payload"
+  echo "      ACM      usb-cdc-acm for custom payload acm serial support"
+  echo "      HID      usb-hid keyboard/mouse for pyducky script payload (zero-hid)"
+  echo "      UMS      usb-mass-storage for custom payload"
+  echo "      HID_UMS  usb-hid + usb-mass-storage combo"
+  echo "      *        custom usb-gadget scheme name (gt@NAME.service)"
+  echo "      STOP_ALL stop all usb-gadget functions"
+  exit 1
+}
+
+if [ -z "$1" ]; then
+  usage
+fi
+
+case "$1" in
+  STOP_ALL)
+    stop_all
+    ;;
+  DEBUG|NCM|ACM|HID|UMS|HID_UMS)
+    stop_all
+    start_mode "${1,,}"
+    ;;
+  *)
+    stop_all
+    start_mode "$1"
+    ;;
+esac
+

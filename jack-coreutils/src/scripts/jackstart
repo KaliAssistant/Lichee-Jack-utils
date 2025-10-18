@@ -11,28 +11,6 @@ prepare_usb_gadgat() {
     echo "device" > /proc/cviusb/otg_role
 }
 
-umount_udisk() {
-    sync
-    LOOPDEV=$(losetup -j "/root/udisk.img" | cut -d: -f1)
-    if [ -n "$LOOPDEV" ]; then
-        $LOG "Udisk is attached at $LOOPDEV"
-        MNTPOINT=$(mount | grep "^/root/udisk.img" | awk '{print $3}')
-        if [ -n "$MNTPOINT" ]; then
-            $LOG "Unmounting $MNTPOINT ..."
-            umount -lf "$MNTPOINT"
-        fi
-        $LOG "Deaching $LOOPDEV ..."
-        losetup -d "$LOOPDEV"
-    fi
-}
-
-mount_udisk() {
-    $LOG "Mounting udisk to /root/udisk.d ..."
-    mkdir -p /root/udisk.d
-    mount -o loop /root/udisk.img /root/udisk.d
-}
-
-
 enter_payload1_mode() {
     $LOG "Entering PAYLOAD1 mode"
     MODE="PAYLOAD1"
@@ -42,12 +20,7 @@ enter_payload1_mode() {
     macchanger -r end0
     ip link set end0 up
 
-    umount_udisk
-    sleep 0.5
-    mount_udisk
-
-    systemctl stop usb-gadget-rndis-usb0.service
-    systemctl stop gt@*.service
+    USBMODE STOP_ALL
     systemctl stop ssh.service
 
     /usr/bin/RUN MOD1
@@ -66,12 +39,7 @@ enter_payload2_mode() {
     macchanger -r end0
     ip link set end0 up
 
-    umount_udisk
-    sleep 0.5
-    mount_udisk
-
-    systemctl stop usb-gadget-rndis-usb0.service
-    systemctl stop gt@*.service
+    USBMODE STOP_ALL
     systemctl stop ssh.service
 
     /usr/bin/RUN MOD2
@@ -86,16 +54,11 @@ enter_debug_mode() {
     MODE="DEBUG"
     /usr/bin/LED -c 0000FF -lds 1000000
 
-    umount_udisk
     prepare_usb_gadgat
 
-    pkill -9 dnsmasq
-
-    systemctl stop gt@*.service
-    sleep 0.5
-    systemctl start gt@debug.service
-    sleep 0.5
-    systemctl start usb-gadget-rndis-usb0.service
+    USBMODE DEBUG
+    USBNET SETIP 10.42.0.1/24
+    UDHCPCTL START debug-usb0
     systemctl start ssh.service
 
     sleep 1
@@ -129,35 +92,6 @@ enter_idle_mode() {
     done
 }
 
-
-enter_factory_mode() {
-    $LOG "Entering FACTORY mode"
-    /usr/bin/LED -c FFFF00 -lbs 1000000
-
-    prepare_usb_gadgat
-    
-    systemctl stop gt@*.service
-    sleep 0.5
-    systemctl start gt@factory.service
-    sleep 0.5
-    systemctl start usb-gadget-rndis-usb0.service
-    systemctl start ssh.service
-
-    while true
-    do
-        sleep 1 # loop until reboot
-    done
-}
-
-check_config_all() {
-    if [ ! -e /root/config/licheejack.toml ] || [ ! -e /root/udisk.img ]; then
-        $LOG_ERR "/root/config/licheejack.toml or /root/udisk.img not found !"
-        $LOG_ERR "Please copy your licheejack config and udisk file to /root."
-        enter_factory_mode
-    fi
-}
-
-
 run() {
     case $MODSWITCH_POS in
         "switch2")
@@ -171,8 +105,5 @@ run() {
             ;;
     esac
 }
-
-
-check_config_all
 
 run > /dev/null 2>&1

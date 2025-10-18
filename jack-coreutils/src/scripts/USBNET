@@ -1,0 +1,73 @@
+#!/usr/bin/bash
+set -o pipefail
+
+# --- Configuration ---
+IFACE="usb0"  # change if your USB network interface is named differently
+
+# --- Logging helpers ---
+LOG()     { logger -t LicheeJack "[*] $*"; }
+LOG_ERR() { logger -t LicheeJack -p err "[!] $*"; }
+
+# --- Usage helper ---
+usage() {
+  echo "Usage: $0 [ACTION] [ARG]"
+  echo "       $0 SETIP <ip/mask>   # e.g. 10.42.0.1/24"
+  echo "       $0 NOIP              # remove IP from $IFACE"
+  echo "       $0 IFUP|IFDOWN       # bring interface up/down"
+  exit 1
+}
+
+# --- Main logic ---
+case "$1" in
+  SETIP)
+    if [ -z "$2" ]; then
+      usage
+    fi
+    LOG "USBNET: Assigning IP $2 to $IFACE ..."
+    if ! ip addr flush dev "$IFACE" 2>/dev/null; then
+      LOG_ERR "USBNET: Failed to flush old IPs on $IFACE"
+    fi
+    if ip addr add "$2" dev "$IFACE" 2>&1 | logger -t LicheeJack; then
+      ip link set "$IFACE" up
+      LOG "USBNET: $IFACE configured with $2"
+    else
+      LOG_ERR "USBNET: Failed to assign IP $2 to $IFACE"
+      exit 1
+    fi
+    ;;
+
+  NOIP)
+    LOG "USBNET: Removing all IPs from $IFACE ..."
+    if ip addr flush dev "$IFACE" 2>&1 | logger -t LicheeJack; then
+      LOG "USBNET: $IFACE IP addresses cleared"
+    else
+      LOG_ERR "USBNET: Failed to clear IPs from $IFACE"
+      exit 1
+    fi
+    ;;
+
+  IFUP)
+    LOG "USBNET: Bringing interface $IFACE up ..."
+    if ip link set "$IFACE" up 2>&1 | logger -t LicheeJack; then
+      LOG "USBNET: $IFACE is now UP"
+    else
+      LOG_ERR "USBNET: Failed to bring $IFACE up"
+      exit 1
+    fi
+    ;;
+
+  IFDOWN)
+    LOG "USBNET: Bringing interface $IFACE down ..."
+    if ip link set "$IFACE" down 2>&1 | logger -t LicheeJack; then
+      LOG "USBNET: $IFACE is now DOWN"
+    else
+      LOG_ERR "USBNET: Failed to bring $IFACE down"
+      exit 1
+    fi
+    ;;
+
+  *)
+    usage
+    ;;
+esac
+

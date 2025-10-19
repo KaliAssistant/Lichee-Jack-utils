@@ -2,7 +2,7 @@
 id=dhcp-client
 uuid=122043b3-f8bd-43fb-85f0-7701407f1376
 type=ethernet
-autoconnect=true
+autoconnect=false
 interface-name=end0
 
 [ethernet]

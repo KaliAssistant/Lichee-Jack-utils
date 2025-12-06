@@ -1,0 +1,62 @@
+#!/usr/bin/bash
+# AUDIOCTL - simple audio control helper
+
+
+case "$1" in
+  MICVOL)
+    if [ -z "$2" ]; then
+      echo "Usage: $0 MICVOL <0-24>" >&2
+      exit 1
+    fi
+    MVOL="$2"
+    if [ "$MVOL" -lt 0 ] || [ "$MVOL" -gt 24 ]; then
+      echo "Mic volume must be between 0 and 24" >&2
+      exit 1
+    fi
+    echo "Setting ADC Capture Volume to $MVOL" >&2
+    amixer -D hw:0 cset name='ADC Capture Volume' "$MVOL" >&2
+    ;;
+
+  SPKVOL)
+    if [ -z "$2" ]; then
+      echo "Usage: $0 SPKVOL <0-32>" >&2
+      exit 1
+    fi
+    SVOL="$2"
+    if [ "$SVOL" -lt 0 ] || [ "$SVOL" -gt 32 ]; then
+      echo "Speaker volume must be between 0 and 32" >&2
+      exit 1
+    fi
+    echo "Setting DAC Playback Volume to $SVOL" >&2
+    amixer -D hw:1 cset name='DAC Playback Volume' "$SVOL" >&2
+    ;;
+
+  MICMUTE)
+    echo "Setting ADC Capture Mute to 1 (mute)" >&2
+    amixer -D hw:0 cset name='ADC Capture Mute' 1 >&2
+    ;;
+
+  MICUNMUTE)
+    echo "Setting ADC Capture Mute to 0 (unmute)" >&2
+    amixer -D hw:0 cset name='ADC Capture Mute' 0 >&2
+    ;;
+
+  SPKMUTE)
+    echo "Setting DAC Playback MUTE to 1 (mute)" >&2
+    amixer -D hw:1 cset name='DAC Playback MUTE' 1 >&2
+    ;;
+
+  SPKUNMUTE)
+    echo "Setting DAC Playback MUTE to 0 (unmute)" >&2
+    amixer -D hw:1 cset name='DAC Playback MUTE' 0 >&2
+    ;;
+
+  *)
+    echo "Usage:" >&2
+    echo "  $0 MICVOL <0-24>" >&2
+    echo "  $0 SPKVOL <0-32>" >&2
+    echo "  $0 MICMUTE | MICUNMUTE" >&2
+    echo "  $0 SPKMUTE | SPKUNMUTE" >&2
+    exit 1
+    ;;
+esac

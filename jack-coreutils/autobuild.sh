@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 set -e
 
+. "$(dirname "$0")/../scripts/build-common.sh"
+
 rm -rf build pkg
 
 ppwd=$(pwd)
@@ -25,4 +27,4 @@ chmod +x ./build/etc/update-motd.d/*
 chmod 600 ./build/etc/NetworkManager/system-connections/*.nmconnection
 mkdir -p ./pkg
 
-dpkg-deb --build build ./pkg/jack-coreutils_0.0.1_licheejack_riscv64.deb
+fakeroot dpkg-deb --build build ./pkg/jack-coreutils_0.0.1_licheejack_riscv64.deb

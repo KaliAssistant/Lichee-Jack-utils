@@ -3,6 +3,7 @@
 .unused
 .hidden
 .kaliworkingspace
+out/
 
 # Apple =============
 .DS_Store

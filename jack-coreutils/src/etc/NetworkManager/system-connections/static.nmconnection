@@ -14,5 +14,6 @@ method=manual
 [ipv6]
 addr-gen-mode=stable-privacy
 method=auto
+never-default=true
 
 [proxy]

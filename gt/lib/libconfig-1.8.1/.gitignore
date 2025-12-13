@@ -1,49 +1,6 @@
 *.o
 *.a
 *.lo
-*.*~
-*~
-# http://www.gnu.org/software/autoconf
-
-autom4te.cache/
-autoscan.log
-autoscan-*.log
-aclocal.m4
-compile
-config.cache
-config.guess
-config.h.in
-config.h.in~
-config.log
-config.status
-config.sub
-configure
-configure~
-configure.scan
-depcomp
-install-sh
-missing
-stamp-h1
-
-libtool
-config.h
-
-# https://www.gnu.org/software/libtool/
-
-ltmain.sh
-
-# http://www.gnu.org/software/texinfo
-
-texinfo.tex
-
-
-
-# Generated Makefile
-# (meta build system like autotools,
-# can automatically generate from config.status script
-# (which is called by configure script))
-Makefile
-
 autom4te.cache
 config.log
 config.status
@@ -62,26 +19,3 @@ temp
 *.user
 *.userosscache
 *.sln.docstates
-
-examples/c++/example1
-examples/c++/example2
-examples/c++/example3
-examples/c++/example4
-examples/c/example1
-examples/c/example2
-examples/c/example3
-examples/c/example4
-lib/libconfig++.pc
-lib/libconfig++Config.cmake
-lib/libconfig.pc
-lib/libconfigConfig.cmake
-libconfig.spec
-tests/libconfig_tests
-!aux-build/compile
-!aux-build/config.guess
-!aux-build/config.sub
-!aux-build/depcomp
-!aux-build/install-sh
-!aux-build/ltmain.sh
-!aux-build/missing
-!aux-build/texinfo.tex

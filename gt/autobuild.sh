@@ -1,12 +1,9 @@
 #!/usr/bin/bash
 set -e
 
-for tool in cmake make a2x pkgconf autoconf automake libtool riscv64-linux-gnu-gcc riscv64-linux-gnu-g++; do
-    if ! command -v $tool >/dev/null 2>&1; then
-        echo "Error: $tool not found. Please install it." >&2
-        exit 1
-    fi
-done
+. "$(dirname "$0")/../scripts/build-common.sh"
+
+need_tools cmake make a2x pkgconf autoconf automake libtool riscv64-linux-gnu-gcc riscv64-linux-gnu-g++
 
 rm -rf build lib/build src/build pkg
 
@@ -65,4 +62,4 @@ cp ./systemd/99-udc.rules ./build/usr/lib/udev/rules.d
 
 cp -r ./DEBIAN ./build
 mkdir -p ./pkg
-dpkg-deb --build build ./pkg/gt_0.0.1_riscv64.deb
+fakeroot dpkg-deb --build build ./pkg/gt_0.0.1_riscv64.deb

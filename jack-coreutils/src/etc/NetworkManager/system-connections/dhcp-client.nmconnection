@@ -14,5 +14,6 @@ dns=1.1.1.1;8.8.8.8;
 [ipv6]
 addr-gen-mode=stable-privacy
 method=auto
+never-default=true
 
 [proxy]

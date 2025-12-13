@@ -1,4 +1,28 @@
 #!/usr/bin/bash
+#
+# USBNET - USB network interface helper
+#
+# Manages IP configuration and link state for the USB
+# network interface (default: usb0).
+#
+# Actions:
+#   SETIP <ip/mask>   Assign static IP
+#   NOIP             Remove all IP addresses
+#   IFUP / IFDOWN    Bring interface up or down
+#
+# Typically used alongside USBMODE DEBUG/NCM.
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
+
 set -o pipefail
 
 # --- Configuration ---

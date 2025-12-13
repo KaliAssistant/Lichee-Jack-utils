@@ -1,4 +1,31 @@
 #!/usr/bin/bash
+#
+# UDISKCTL - USB disk image mount helper
+#
+# Mounts and unmounts disk image files using loop devices.
+#
+# Actions:
+#   MOUNT  <image> <mountpoint>
+#   UMOUNT <image>
+#
+# Automatically:
+#   - Detects associated loop devices
+#   - Performs lazy unmounts if necessary
+#   - Cleans up loop attachments
+#
+# Used for USB mass-storage payloads.
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
+
 set -o pipefail
 
 LOG()     { logger -t LicheeJack "[*] $*"; }

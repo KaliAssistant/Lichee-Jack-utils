@@ -1,4 +1,29 @@
 #!/usr/bin/bash
+#
+# UDHCPCTL - udhcpd systemd unit controller
+#
+# Manages udhcpd instances via systemd template units:
+#   udhcpd@<unit>.service
+#
+# Actions:
+#   START <unit>     Start DHCP server
+#   RESTART <unit>   Restart DHCP server
+#   STOP <unit>      Stop DHCP server
+#   STOP_ALL         Stop all udhcpd instances
+#
+# Includes safety checks to verify unit existence and state.
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
+
 set -o pipefail
 
 LOG()     { logger -t LicheeJack "[*] $*"; }

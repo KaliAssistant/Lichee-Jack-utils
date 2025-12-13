@@ -1,4 +1,33 @@
 #!/usr/bin/bash
+#
+# WIFIMODE - Wi-Fi interface mode switcher
+#
+# Recreates wlan0 with the appropriate interface type
+# depending on the requested mode:
+#
+#   MANAGED    NetworkManager-controlled client mode
+#   UNMANAGED  Manual control (e.g. hostapd)
+#   MONITOR    Active monitor mode with injection support
+#
+# This script safely deletes and recreates wlan0 to avoid
+# driver and cfg80211 state conflicts.
+#
+# Dependencies:
+#   - iw
+#   - nmcli
+#   - jq
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
+
 set -o pipefail
 
 LOG()     { logger -t LicheeJack "[*] $*"; }

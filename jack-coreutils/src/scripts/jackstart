@@ -1,4 +1,39 @@
 #!/bin/bash
+#
+# jackstart - Main control daemon for the Lichee-Jack platform
+#
+# This daemon is responsible for:
+#   - Detecting the hardware mode switch position
+#   - Initializing USB gadget roles (DEBUG / PAYLOAD modes)
+#   - Controlling LED status indications
+#   - Managing network interfaces, MAC randomization, and services
+#   - Launching payload modules based on switch position
+#
+# Mode overview:
+#   DEBUG     : USB ncm gadget enabled, static IP (with dhcp server)
+#   , usb SSH access available
+#   PAYLOAD1  : Executes MOD1 payload, disables SSH, randomizes MAC
+#   PAYLOAD2  : Executes MOD2 payload, disables SSH, randomizes MAC
+#
+# The daemon runs continuously and automatically switches modes
+# when the physical switch state changes.
+#
+# External dependencies:
+#   - /usr/bin/SWITCH     : Reads hardware switch position
+#   - /usr/bin/LED        : RGB LED control utility
+#   - /usr/bin/RUN        : Payload execution wrapper
+#   - USBMODE / USBNET    : USB gadget control utilities
+#   - macchanger          : Network MAC randomization
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
 
 export LOG="logger -t LicheeJack [*]"
 export LOG_ERR="logger -t LicheeJack -p 3 [!]"

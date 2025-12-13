@@ -1,11 +1,35 @@
 #!/bin/sh
-# /usr/bin/BATTERY
-# Reads Li-ion battery voltage from /dev/cvi-saradc0 and prints percentage@voltage
-# ADC: 0–4095  →  0–4.8 V
+#
+# BATTERY - Li-ion battery voltage and percentage reader
+#
+# Reads raw ADC values from the SAR ADC device and converts
+# them into a human-readable battery percentage and voltage.
+#
+# Output format:
+#   <percentage>%@<voltage>v
+#   e.g. 78%@3.9123v
+#
+# ADC characteristics:
+#   - Range: 0–4095
+#   - Voltage: 0–4.6V
+#
+# Uses a realistic Li-ion discharge curve approximation
+# rather than linear scaling.
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
 
 ADC_DEV="/dev/cvi-saradc0"
 MAX_ADC=4095
-MAX_VOLT=4.8
+MAX_VOLT=4.6
 
 # Optional: select ADC channel
 echo 1 > "$ADC_DEV" 2>/dev/null

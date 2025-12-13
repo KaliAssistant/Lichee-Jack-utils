@@ -1,4 +1,37 @@
 #!/bin/bash
+#
+# NETMODE - Network mode controller for interface end0
+#
+# Controls NetworkManager connections and DHCP behavior for
+# the primary Ethernet interface (end0).
+#
+# Supported modes:
+#   DHCP_CLIENT : Obtain address via DHCP
+#   DHCP_SERVER : Act as DHCP server (udhcpd)
+#   STATIC      : Use static IP configuration
+#   AUTO        : Sniff network and decide client/server mode
+#   STOP_ALL    : Disable all active connections
+#   CUSTOM      : Bring up a named NetworkManager connection
+#
+# AUTO mode performs passive DHCP traffic inspection to infer
+# whether a DHCP server is present on the network.
+#
+# Dependencies:
+#   - nmcli
+#   - tcpdump
+#   - udhcpd (via UDHCPCTL)
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
+
 set -o pipefail
 
 LOG()     { logger -t LicheeJack "[*] $*"; }

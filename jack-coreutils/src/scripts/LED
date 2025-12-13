@@ -1,5 +1,30 @@
 #!/bin/bash
-
+#
+# LED - RGB LED control wrapper for Lichee-Jack
+#
+# This script acts as a thin wrapper around the `shmled` daemon.
+# It ensures that only a single instance of shmled is running
+# by terminating any existing process before starting a new one.
+#
+# All command-line arguments are forwarded directly to shmled.
+#
+# Typical usage:
+#   LED -c 00FF00
+#   LED -c FF0000 -lbs 500000
+#
+# Dependencies:
+#   - shmled (shared-memory LED daemon)
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
 
 if pgrep -f shmled; then
     pkill shmled > /dev/null 2>&1

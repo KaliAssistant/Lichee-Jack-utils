@@ -1,4 +1,36 @@
 #!/bin/bash
+#
+# RUN - Payload execution dispatcher for Lichee-Jack
+#
+# This script prepares the payload execution environment and
+# launches payloads based on the selected mode:
+#
+#   MOD1 : Execute payload from /root/payloads.d/mod1.d
+#   MOD2 : Execute payload from /root/payloads.d/mod2.d
+#   FILE : Execute a user-specified payload file
+#
+# Supported payload formats:
+#   - payload.py   (executed with python3)
+#   - payload.sh   (executed with bash)
+#   - payload      (raw executable script)
+#
+# The script also:
+#   - Verifies payload and loot directories
+#   - Creates /root/loot.d if missing
+#   - Signals fatal errors via LED patterns
+#
+# This tool is typically invoked by jackstart.
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
 
 ARG=$1
 

@@ -1,4 +1,31 @@
 #!/usr/bin/bash
+#
+# USBMODE - USB gadget mode controller
+#
+# Controls USB gadget configurations using systemd units:
+#   gt@<mode>.service
+#
+# Supported modes:
+#   DEBUG, NCM, ACM, HID, UMS, HID_UMS
+#
+# Also supports custom gadget layouts by specifying
+# an arbitrary service name.
+#
+# Ensures:
+#   - Previous gadget instances are stopped
+#   - Target gadget service exists and is active
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
+
 set -o pipefail
 
 LOG()     { logger -t LicheeJack "[*] $*"; }

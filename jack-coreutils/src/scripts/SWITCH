@@ -1,4 +1,25 @@
 #!/bin/bash
+#
+# SWITCH - Hardware mode switch reader
+#
+# Reads the current physical mode switch position from
+# /dev/modsw and prints a normalized identifier:
+#
+#   switch1
+#   switch2
+#
+# Used by jackstart to select operating modes.
+#
+#
+# SPDX-License-Identifier: GPL-3.0
+#
+# Copyright (C) 2025 KaliAssistant
+# Author: KaliAssistant
+#
+# This file is part of the Lichee-Jack project.
+# It is free software: you may redistribute and/or modify it under
+# the terms of the GNU General Public License v3.0 or later.
+#
 
 code=$(cat /dev/modsw)
 

@@ -7,4 +7,5 @@ pkg/
 *.s
 *.so
 *.so.dbg
-src/gt
+*.d
+src/wg

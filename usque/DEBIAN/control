@@ -1,0 +1,40 @@
+Package: usque
+Version: 0.0.1-licheejack
+Section: net
+Priority: optional
+Architecture: riscv64
+Maintainer: KaliAssistant <work.kaliassistant.github@gmail.com>
+Description: Open-source reimplementation of the Cloudflare WARP client's MASQUE protocol.
+ Usque is an open-source reimplementation of the Cloudflare WARP client's MASQUE mode.
+ It leverages the Connnect-IP (RFC 9484) protocol and comes with many operation modes 
+ including a native tunnel (currently Linux only), a SOCKS5 proxy, and a HTTP proxy.
+ .
+ Disclaimer:
+ Please do NOT use this tool for abuse. At the end of the day you hurt Cloudflare, 
+ which is probably unfair as you get this stuff even for free, secondly you will 
+ most likely get this tool sanctioned and ruin the fun for everyone.
+ .
+ The tool mimics certain properties of the official clients, those are mostly done 
+ for stability and compatibility reasons. I never intended to make this tool 
+ indistinguishable from the official clients. That means if they want to detect 
+ this tool, they can. I am not responsible for any consequences that may arise 
+ from using this tool. That is absolutely your own responsibility. I am not 
+ responsible for any damage that may occur to your system or your network. This 
+ tool is provided as is without any guarantees. Use at your own risk.
+ .
+ While the tool was made with security considerations in mind, I am not a security 
+ expert nor an IT professional. I am just a hobbyist and this is just a hobby 
+ project. Again, use at your own risk. However security reports are welcome. Feel 
+ free to open an issue with your contact details and I will get back to you, so 
+ you can share your findings IN PRIVATE. Once there was enough time to fix the 
+ issue, I will credit you in the release notes and the findings can be made public. 
+ I appreciate any help in making this tool more secure.
+ .
+ This tool is not affiliated with Cloudflare in any way. The tool was neither 
+ endorsed nor reviewed by Cloudflare. It is an independent research project. 
+ Cloudflare Warp, Warp+, 1.1.1.1™, Cloudflare Access™, Cloudflare Gateway™ and 
+ Cloudflare One™ are all registered trademarks/wordmarks of Cloudflare, Inc. If 
+ you are a Cloudflare employee and you think this project is in any way harmful, 
+ please open an issue and I will do my best to contact you and resolve the issue.
+ .
+ WireGuard™ is a registered trademark of Jason A. Donenfeld.

@@ -13,6 +13,8 @@ PROJECTS=(
   jack-coreutils
   shmled
   wireguard-tools
+  wgcf
+  usque
 )
 
 for p in "${PROJECTS[@]}"; do

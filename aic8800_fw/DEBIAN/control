@@ -1,5 +1,5 @@
 Package: aic8800-firmware
-Version: 1.0-1
+Version: 0.0.1-licheejack
 Section: kernel
 Priority: optional
 Architecture: riscv64
@@ -11,4 +11,4 @@ Description: AIC8800 SDIO Wi-Fi firmware and modprobe configuration
  module parameter aicwf_dbg_level=1 by default to limit driver logs
  to errors only.
 Depends: kmod
-License: Proprietary
+

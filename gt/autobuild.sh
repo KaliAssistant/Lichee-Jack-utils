@@ -62,4 +62,4 @@ cp ./systemd/99-udc.rules ./build/usr/lib/udev/rules.d
 
 cp -r ./DEBIAN ./build
 mkdir -p ./pkg
-fakeroot dpkg-deb --build build ./pkg/gt_0.0.1_riscv64.deb
+fakeroot dpkg-deb --build build ./pkg/gt_0.0.1_licheejack_riscv64.deb

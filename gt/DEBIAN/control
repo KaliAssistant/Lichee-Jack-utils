@@ -1,5 +1,5 @@
 Package: gt
-Version: 0.0.1
+Version: 0.0.1-licheejack
 Section: utils
 Priority: optional
 Architecture: riscv64

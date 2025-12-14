@@ -15,4 +15,4 @@ cp -r ./firmware ./build/usr/lib
 cp -r ./modprobe.d ./build/etc
 mkdir -p ./pkg
 
-fakeroot dpkg-deb --build build ./pkg/aic8800-firmware_1.0.1_licheejack_riscv64.deb
+fakeroot dpkg-deb --build build ./pkg/aic8800-firmware_0.0.1_licheejack_riscv64.deb

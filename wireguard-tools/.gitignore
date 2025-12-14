@@ -1,0 +1,10 @@
+build/
+pkg/
+
+*.o
+*.o.*
+*.a
+*.s
+*.so
+*.so.dbg
+src/gt

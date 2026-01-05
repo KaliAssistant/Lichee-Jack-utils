@@ -44,7 +44,8 @@ jobs:
             gcc-riscv64-linux-gnu \
             g++-riscv64-linux-gnu \
             texinfo \
-            bison
+            bison \
+            libusbgx-dev
 
       - name: Checkout source
         uses: actions/checkout@v4

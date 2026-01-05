@@ -32,8 +32,8 @@ jobs:
             libtool \
             pkg-config \
             asciidoc \
-            gcc-riscv64-gnu \
-            g++-riscv64-gnu \
+            gcc-riscv64-linux-gnu \
+            g++-riscv64-linux-gnu \
             golang \
             xz-utils
 

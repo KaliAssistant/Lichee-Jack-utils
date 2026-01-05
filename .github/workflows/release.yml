@@ -41,7 +41,8 @@ jobs:
             asciidoc \
             cmake \
             gcc-riscv64-linux-gnu \
-            g++-riscv64-linux-gnu
+            g++-riscv64-linux-gnu \
+            texinfo
 
       - name: Checkout source
         uses: actions/checkout@v4

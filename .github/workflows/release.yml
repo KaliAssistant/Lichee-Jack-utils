@@ -43,7 +43,8 @@ jobs:
             cmake \
             gcc-riscv64-linux-gnu \
             g++-riscv64-linux-gnu \
-            texinfo
+            texinfo \
+            bison
 
       - name: Checkout source
         uses: actions/checkout@v4

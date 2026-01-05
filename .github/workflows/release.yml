@@ -17,6 +17,10 @@ jobs:
       image: debian:stable
       options: --privileged
 
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      GOFLAGS: -buildvcs=false
+
     steps:
       - name: Install base tools
         run: |

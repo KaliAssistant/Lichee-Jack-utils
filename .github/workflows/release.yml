@@ -45,7 +45,8 @@ jobs:
             g++-riscv64-linux-gnu \
             texinfo \
             bison \
-            libusbgx-dev
+            libusbgx-dev \
+            flex
 
       - name: Checkout source
         uses: actions/checkout@v4

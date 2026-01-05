@@ -1,0 +1,78 @@
+name: Build & Release Lichee-Jack Utils
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            devscripts \
+            debhelper \
+            fakeroot \
+            autotools-dev \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            asciidoc \
+            riscv64-linux-gnu-gcc \
+            riscv64-linux-gnu-g++ \
+            golang \
+            xz-utils
+
+      - name: Build all packages
+        run: |
+          chmod +x build-all.sh
+          ./build-all.sh
+
+      - name: Create release tarball
+        run: |
+          chmod +x release.sh
+          ./release.sh
+
+      - name: Locate release artifacts
+        id: artifacts
+        run: |
+          echo "RELEASE_DIR=$(ls -d .release/* | tail -n1)" >> $GITHUB_ENV
+          echo "TARBALL=$(ls .release/*/*.tar.xz)" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Lichee-Jack Utils ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: |
+            out/*.deb
+            ${{ env.TARBALL }}
+          body: |
+            ## Lichee-Jack Utils Release
+
+            - Auto-built Debian packages
+            - Includes:
+              - gt
+              - shmled
+              - jack-coreutils
+              - wireguard-tools
+              - wgcf
+              - usque
+              - aic8800_fw
+
+            Built from commit: `${{ github.sha }}`
+

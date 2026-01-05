@@ -38,6 +38,7 @@ jobs:
             pkgconf \
             golang \
             asciidoc \
+            cmake \
             gcc-riscv64-linux-gnu \
             g++-riscv64-linux-gnu
 

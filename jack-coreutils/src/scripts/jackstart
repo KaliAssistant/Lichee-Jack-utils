@@ -55,6 +55,8 @@ enter_payload1_mode() {
     macchanger -r end0
     ip link set end0 up
 
+    prepare_usb_gadgat
+
     USBMODE STOP_ALL
     systemctl stop ssh.service
 
@@ -73,6 +75,8 @@ enter_payload2_mode() {
     ip link set end0 down
     macchanger -r end0
     ip link set end0 up
+
+    prepare_usb_gadgat
 
     USBMODE STOP_ALL
     systemctl stop ssh.service

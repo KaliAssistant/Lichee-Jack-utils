@@ -1,4 +1,4 @@
-Package: wireguard-tools
+Package: wireguard-tools-only
 Version: 0.0.1-licheejack
 Section: net
 Priority: optional

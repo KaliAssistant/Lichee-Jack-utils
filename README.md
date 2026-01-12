@@ -40,7 +40,7 @@ All components are organized as **self‑contained subpackages**, each with its 
 | ------------------- | ------------------ | -------------------------------- | ------------------------- |
 | **usque**           | `usque/`           | Cloudflare WARP MASQUE client    | Diniboy1123/usque         |
 | **wgcf**            | `wgcf/`            | Cloudflare WARP WireGuard client | ViRb3/wgcf                |
-| **wireguard-tools** | `wireguard-tools/` | WireGuard user‑space tools only  | WireGuard/wireguard-tools |
+| **wireguard-tools-only** | `wireguard-tools/` | WireGuard user‑space tools only  | WireGuard/wireguard-tools |
 
 ---
 
